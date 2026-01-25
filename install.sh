@@ -168,23 +168,41 @@ if [ -f "$ZSHRC" ] && [ ! -L "$ZSHRC" ]; then
 fi
 
 # ====================
-# Symlinks
+# Copy or Symlink files
 # ====================
 log_info "Creating zsh config directory"
 run "mkdir -p '$ZSH_DIR'"
 
-log_info "Linking zsh config files"
-run "ln -sf '$DOTFILES_DIR/zsh/zshrc' '$ZSHRC'"
-run "ln -sf '$DOTFILES_DIR/zsh/keybindings.zsh' '$ZSH_DIR/keybindings.zsh'"
-run "ln -sf '$DOTFILES_DIR/zsh/history.zsh' '$ZSH_DIR/history.zsh'"
-run "ln -sf '$DOTFILES_DIR/zsh/fzf.zsh' '$ZSH_DIR/fzf.zsh'"
-run "ln -sf '$DOTFILES_DIR/zsh/plugins.zsh' '$ZSH_DIR/plugins.zsh'"
+if $CLEANUP_DOTFILES; then
+  # Running from curl - copy files instead of symlinking
+  log_info "Copying zsh config files"
+  run "cp '$DOTFILES_DIR/zsh/zshrc' '$ZSHRC'"
+  run "cp '$DOTFILES_DIR/zsh/keybindings.zsh' '$ZSH_DIR/keybindings.zsh'"
+  run "cp '$DOTFILES_DIR/zsh/history.zsh' '$ZSH_DIR/history.zsh'"
+  run "cp '$DOTFILES_DIR/zsh/fzf.zsh' '$ZSH_DIR/fzf.zsh'"
+  run "cp '$DOTFILES_DIR/zsh/plugins.zsh' '$ZSH_DIR/plugins.zsh'"
 
-if $ADD_NVM; then
-  log_info "Linking NVM config"
-  run "ln -sf '$DOTFILES_DIR/zsh/nvm.zsh' '$ZSH_DIR/nvm.zsh'"
+  if $ADD_NVM; then
+    log_info "Copying NVM config"
+    run "cp '$DOTFILES_DIR/zsh/nvm.zsh' '$ZSH_DIR/nvm.zsh'"
+  else
+    run "rm -f '$ZSH_DIR/nvm.zsh' || true"
+  fi
 else
-  run "rm -f '$ZSH_DIR/nvm.zsh' || true"
+  # Running from cloned repo - use symlinks for easier updates
+  log_info "Linking zsh config files"
+  run "ln -sf '$DOTFILES_DIR/zsh/zshrc' '$ZSHRC'"
+  run "ln -sf '$DOTFILES_DIR/zsh/keybindings.zsh' '$ZSH_DIR/keybindings.zsh'"
+  run "ln -sf '$DOTFILES_DIR/zsh/history.zsh' '$ZSH_DIR/history.zsh'"
+  run "ln -sf '$DOTFILES_DIR/zsh/fzf.zsh' '$ZSH_DIR/fzf.zsh'"
+  run "ln -sf '$DOTFILES_DIR/zsh/plugins.zsh' '$ZSH_DIR/plugins.zsh'"
+
+  if $ADD_NVM; then
+    log_info "Linking NVM config"
+    run "ln -sf '$DOTFILES_DIR/zsh/nvm.zsh' '$ZSH_DIR/nvm.zsh'"
+  else
+    run "rm -f '$ZSH_DIR/nvm.zsh' || true"
+  fi
 fi
 
 # ====================
