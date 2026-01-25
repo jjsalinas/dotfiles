@@ -2,25 +2,48 @@
 set -e
 
 # ====================
+# Logging (early definitions for clone step)
+# ====================
+log_info()  { echo "[INFO] $*"; }
+log_warn()  { echo "[WARN] $*"; }
+log_error() { echo "[ERROR] $*" >&2; }
+
+# ====================
+# Detect installation method and setup DOTFILES_DIR
+# ====================
+if [ -f "$(dirname "$0")/zsh/zshrc" ]; then
+  # Running from cloned repo
+  DOTFILES_DIR="$(cd "$(dirname "$0")" && pwd)"
+  CLEANUP_DOTFILES=false
+  log_info "Running from cloned repository at $DOTFILES_DIR"
+else
+  # Running from curl, need to clone
+  DOTFILES_DIR="$HOME/.dotfiles-tmp"
+  CLEANUP_DOTFILES=true
+
+  log_info "Running from curl, cloning dotfiles repository..."
+
+  rm -rf "$DOTFILES_DIR"
+  git clone https://github.com/jjsalinas/dotfiles.git "$DOTFILES_DIR"
+
+  log_info "Repository cloned to temporary location: $DOTFILES_DIR"
+fi
+
+# ====================
 # Defaults
 # ====================
 THEME="clean"
 ADD_NVM=false
 DRY_RUN=false
 
-DOTFILES_DIR="$(cd "$(dirname "$0")" && pwd)"
 ZSH_DIR="$HOME/.zsh"
 ZSHRC="$HOME/.zshrc"
 ZSHRC_LOCAL="$HOME/.zshrc.local"
 ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
 
 # ====================
-# Logging
+# Helper functions
 # ====================
-log_info()  { echo "[INFO] $*"; }
-log_warn()  { echo "[WARN] $*"; }
-log_error() { echo "[ERROR] $*" >&2; }
-
 run() {
   if $DRY_RUN; then
     log_info "[dry-run] $*"
@@ -174,6 +197,18 @@ export ZSH_THEME="$THEME"
 EOF
 else
   log_info "[dry-run] would write ~/.zshrc.local with theme $THEME"
+fi
+
+# ====================
+# Cleanup
+# ====================
+if $CLEANUP_DOTFILES; then
+  log_info "Cleaning up temporary files"
+  if ! $DRY_RUN; then
+    rm -rf "$DOTFILES_DIR"
+  else
+    log_info "[dry-run] would remove $DOTFILES_DIR"
+  fi
 fi
 
 # ====================
