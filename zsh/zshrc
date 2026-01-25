@@ -1,0 +1,19 @@
+export ZSH="$HOME/.oh-my-zsh"
+
+ZSH_THEME="${ZSH_THEME:-clean}"
+
+plugins=(
+  git
+  zsh-syntax-highlighting
+)
+
+source $ZSH/oh-my-zsh.sh
+
+# Modular config
+source ~/.zsh/keybindings.zsh
+source ~/.zsh/history.zsh
+source ~/.zsh/fzf.zsh
+source ~/.zsh/plugins.zsh
+
+# Optional local overrides (not committed)
+[ -f ~/.zshrc.local ] && source ~/.zshrc.local
