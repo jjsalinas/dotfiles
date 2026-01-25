@@ -36,3 +36,15 @@ Run `./install.sh --help` to see all available options and details.
 ./install.sh --theme <name>   # Set Oh My Zsh theme (default: clean)
 ./install.sh --add-nvm        # Enable Node Version Manager config
 ```
+
+## One-line install
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/jjsalinas/dotfiles/main/install.sh | bash
+```
+
+With options
+```bash
+curl -fsSL https://raw.githubusercontent.com/jjsalinas/dotfiles/main/install.sh | bash -s -- --theme clean --add-nvm
+```
+
