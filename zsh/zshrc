@@ -15,5 +15,8 @@ source ~/.zsh/history.zsh
 source ~/.zsh/fzf.zsh
 source ~/.zsh/plugins.zsh
 
+# Optional NVM
+[ -f ~/.zsh/nvm.zsh ] && source ~/.zsh/nvm.zsh
+
 # Optional local overrides (not committed)
 [ -f ~/.zshrc.local ] && source ~/.zshrc.local
