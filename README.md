@@ -39,6 +39,7 @@ Run `./install.sh --help` to see all available options and details.
 
 ## One-line install
 
+### Github
 ```bash
 curl -fsSL https://raw.githubusercontent.com/jjsalinas/dotfiles/main/install.sh | bash
 ```
@@ -46,5 +47,11 @@ curl -fsSL https://raw.githubusercontent.com/jjsalinas/dotfiles/main/install.sh 
 With options
 ```bash
 curl -fsSL https://raw.githubusercontent.com/jjsalinas/dotfiles/main/install.sh | bash -s -- --theme clean --add-nvm
+```
+
+### Gitea version
+```bash
+curl -fsSL https://puxorjensap.com/jjsalinas/dotfiles/raw/branch/main/install.sh | bash
+curl -fsSL https://puxorjensap.com/jjsalinas/dotfiles/raw/branch/main/install.sh | bash -s -- --theme clean --add-nvm
 ```
 
