@@ -1,0 +1,25 @@
+// Zed keymap
+//
+// For information on binding keys, see the Zed
+// documentation: https://zed.dev/docs/key-bindings
+//
+// To see the default key bindings run `zed: open default keymap`
+// from the command palette.
+// This file is to be used from vs-code keymap initial setup (Ctrl+k - Ctrl+KEY shortcuts working)
+[
+  {
+    "context": "Workspace",
+    "bindings": {
+      // "ctrl-shift-d":"editor::DuplicateLineDown",
+      // "shift shift": "file_finder::Toggle"
+    },
+  },
+  {
+    "context": "Editor",
+    "bindings": {
+      "ctrl-shift-d":"editor::DuplicateLineDown",
+      "ctrl-.": "editor::ToggleCodeActions",
+      "ctrl-shift-i": "agent::ToggleFocus",
+    },
+  },
+]
