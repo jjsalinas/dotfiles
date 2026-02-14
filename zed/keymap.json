@@ -5,7 +5,7 @@
 //
 // To see the default key bindings run `zed: open default keymap`
 // from the command palette.
-// This file is to be used from vs-code keymap initial setup (Ctrl+k - Ctrl+KEY shortcuts working)
+// This file is to be used from VSCode keymap base setup (Ctrl+K - Ctrl+SOMEKEY shortcuts working)
 [
   {
     "context": "Workspace",
