@@ -19,8 +19,7 @@ This setup is focused on:
 ## Install
 
 Clone the repository and run the installer:
-
-```bash
+```
 git clone https://github.com/jjsalinas/dotfiles.git
 cd dotfiles
 ./install.sh
@@ -29,23 +28,25 @@ cd dotfiles
 ### Options
 
 Run `./install.sh --help` to see all available options and details.
-
-```bash
+```
 ./install.sh --help           # Show all options
 ./install.sh --dry-run        # Show actions without making changes
-./install.sh --theme <name>   # Set Oh My Zsh theme (default: clean)
+./install.sh --theme <n>      # Set Oh My Zsh theme (default: clean)
 ./install.sh --add-nvm        # Enable Node Version Manager config
+./install.sh --update         # Update installed plugins
+./install.sh --check          # Verify installation without making changes
 ```
 
 ## One-line install
 
-### Github
-```bash
+> The one-line install will clone the repo to `~/.dotfiles` automatically.
+
+```
 curl -fsSL https://raw.githubusercontent.com/jjsalinas/dotfiles/main/install.sh | bash
 ```
 
 With options
-```bash
+```
 curl -fsSL https://raw.githubusercontent.com/jjsalinas/dotfiles/main/install.sh | bash -s -- --theme clean --add-nvm
 ```
 
