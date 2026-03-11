@@ -10,7 +10,10 @@ window-width = 120
 window-height = 33
 window-padding-x = 12
 window-padding-y = 10
+# If on GNOME/KDE with client-side decorations use:
 window-decoration = true
+# If using a tiling WM (i3, Sway, Hyprland, etc.), set this:
+# window-decoration = false
 window-title-font-family = Fira Mono
 
 ### Theme / Colors ###
