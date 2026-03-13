@@ -17,37 +17,13 @@ window-decoration = true
 window-title-font-family = Fira Mono
 
 ### Theme / Colors ###
-# repo with themes https://github.com/anhsirk0/ghostty-themes
-# Clean, low-contrast dark theme — similar spirit to zsh "clean"
-background = #1c1c1c
-foreground = #d4d4d4
+# repo with themes at https://github.com/anhsirk0/ghostty-themes
+theme = Subliminal
+# theme = Sakura
 
 ### Cursor
 cursor-style = bar
 cursor-style-blink = false
-cursor-color = #d4d4d4
-
-### Selection
-selection-background = #3a3a3a
-selection-foreground = #ffffff
-
-### ANSI Colors
-palette = 0=#1c1c1c
-palette = 1=#cc6666
-palette = 2=#b5bd68
-palette = 3=#de935f
-palette = 4=#81a2be
-palette = 5=#b294bb
-palette = 6=#8abeb7
-palette = 7=#c5c8c6
-palette = 8=#373b41
-palette = 9=#cc6666
-palette = 10=#b5bd68
-palette = 11=#f0c674
-palette = 12=#81a2be
-palette = 13=#b294bb
-palette = 14=#8abeb7
-palette = 15=#ffffff
 
 ### Shell ###
 shell-integration = zsh
