@@ -62,5 +62,5 @@ scrollback-limit = 10000
 ### Keybinds (Linux) ###
 keybind = ctrl+shift+t=new_tab
 keybind = ctrl+shift+w=close_surface
-keybind = ctrl+shift+d=new_split:right
-keybind = ctrl+shift+shift+d=new_split:down
+# keybind = ctrl+shift+d=new_split:right
+# keybind = ctrl+shift+shift+d=new_split:down
