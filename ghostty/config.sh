@@ -195,7 +195,7 @@ fi
 # Done
 # ====================
 log_info "Ghostty setup complete"
-log_info "Restart Ghostty to apply changes"
+log_info "Restart Ghostty to apply changes, or reload config with: ctrl+shift+,"
 if $DRY_RUN; then
   log_warn "Dry-run mode enabled — no changes were made"
 fi
