@@ -5,14 +5,43 @@
 //
 // To see the default key bindings run `zed: open default keymap`
 // from the command palette.
-// This file is to be used from VSCode keymap base setup (Ctrl+K - Ctrl+SOMEKEY shortcuts working)
 [
   {
     "context": "Workspace",
     "bindings": {
       // "ctrl-shift-d":"editor::DuplicateLineDown",
       // "shift shift": "file_finder::Toggle"
+      // "alt-shift-1": "pane::SplitRight",
+      "ctrl-\"": null, // reset ctrl+shift+2 binding
     },
+  },
+  {
+    "context": "Pane",
+    "bindings": {
+      // Setting Pane flow idem to sublime-text
+      // Bindings done like this as zed read shift+# as the resulting character, not the keys pressed
+      // Layout Management (alt-shift-number)
+      "alt-!": "workspace::CloseAllItemsAndPanes",
+      "alt-\"": "pane::SplitRight",
+      "alt-%": "pane::SplitDown",
+      "ctrl-shift-w": "pane::CloseActiveItem",
+
+      // Focus Tab by index
+      // "alt-1": ["workspace::ActivatePane", 0],
+      // "alt-2": ["workspace::ActivatePane", 1],
+      // "alt-3": ["workspace::ActivatePane", 2],
+      // "alt-4": ["workspace::ActivatePane", 3],
+      // "alt-5": ["workspace::ActivatePane", 4],
+
+      // Move File/Tab to Pane #
+      "ctrl-!": ["workspace::MoveItemToPane", { "destination": 0 }],
+      "ctrl-\"": ["workspace::MoveItemToPane", {"destination": 1 }],
+      "ctrl-·": ["workspace::MoveItemToPane", { "destination": 2 }],
+      "ctrl-$": ["workspace::MoveItemToPane", { "destination": 3 }],
+      // "ctrl-alt-1": ["workspace::MoveItemToPane", { "destination": 0 }],
+      // "ctrl-alt-2": ["workspace::MoveItemToPane", { "destination": 1 }],
+      // "ctrl-alt-3": ["workspace::MoveItemToPane", { "destination": 2 }],
+    }
   },
   {
     "context": "Editor",
@@ -20,6 +49,8 @@
       "ctrl-shift-d":"editor::DuplicateLineDown",
       "ctrl-.": "editor::ToggleCodeActions",
       "ctrl-shift-i": "agent::ToggleFocus",
+      "alt--":"pane::GoBack",
+      "alt-_":"pane::GoForward",
     },
   },
 ]
