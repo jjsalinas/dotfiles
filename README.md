@@ -55,6 +55,8 @@ curl -fsSL https://raw.githubusercontent.com/jjsalinas/dotfiles/main/install.sh 
 ### Gitea version
 ```bash
 curl -fsSL https://git.puxorjensap.com/jjsalinas/dotfiles/raw/branch/main/install.sh | bash
+```
+```bash
 curl -fsSL https://git.puxorjensap.com/jjsalinas/dotfiles/raw/branch/main/install.sh | bash -s -- --theme clean --add-nvm
 ```
 
