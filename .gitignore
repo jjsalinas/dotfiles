@@ -1,2 +1,3 @@
 .zshrc.local
 *.backup.*
+.aider*
