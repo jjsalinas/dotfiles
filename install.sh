@@ -9,6 +9,7 @@ ADD_NVM=false
 DRY_RUN=false
 UPDATE_PLUGINS=false
 CHECK=false
+EASTER_EGG=false
 
 ZSH_DIR="$HOME/.zsh"
 ZSHRC="$HOME/.zshrc"
@@ -74,6 +75,7 @@ Options:
   --update         Update installed plugins (git pull)
   --check          Verify installation without making changes
   --dry-run        Show actions without making changes
+  --easter-egg     Easter egg option (prints a joke)
   --help           Show this help and exit
 
 What this does:
@@ -119,6 +121,9 @@ while [[ $# -gt 0 ]]; do
     --dry-run)
       DRY_RUN=true
       ;;
+    --easter-egg)
+      EASTER_EGG=true
+      ;;
     --help)
       print_help
       exit 0
@@ -130,6 +135,14 @@ while [[ $# -gt 0 ]]; do
   esac
   shift
 done
+
+# ====================
+# Easter egg handling
+# ====================
+if $EASTER_EGG; then
+  log_error "THIS IS A JOKE BROO!"
+  exit 0
+fi
 
 # ====================
 # --check mode
