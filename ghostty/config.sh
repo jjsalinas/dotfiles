@@ -192,6 +192,15 @@ else
 fi
 
 # ====================
+# Install themes
+# ====================
+if ! $DRY_RUN; then
+  log_info "Installing ghostty themes to $GHOSTTY_CONFIG_DIR/themes"
+  SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  run unzip -qo "$SCRIPT_DIR/themes.zip" -d "$GHOSTTY_CONFIG_DIR"
+fi
+
+# ====================
 # Done
 # ====================
 log_info "Ghostty setup complete"
