@@ -36,7 +36,7 @@ print_help() {
 Ghostty terminal setup
 
 Usage:
-  ./setup-ghostty.sh [options]
+  ./config.sh [options]
 
 Options:
   --theme <name>   Ghostty color theme to use (default: Subliminal)
@@ -54,10 +54,10 @@ Themes:
   Pass any theme name with --theme (e.g. --theme Sakura)
 
 Examples:
-  ./setup-ghostty.sh
-  ./setup-ghostty.sh --theme Sakura
-  ./setup-ghostty.sh --theme Nord --dry-run
-  ./setup-ghostty.sh --check
+  ./config.sh
+  ./config.sh --theme Sakura
+  ./config.sh --theme Nord --dry-run
+  ./config.sh --check
 EOF
 }
 

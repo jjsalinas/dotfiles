@@ -12,8 +12,8 @@
       // "ctrl-shift-d":"editor::DuplicateLineDown",
       // "shift shift": "file_finder::Toggle"
       // "alt-shift-1": "pane::SplitRight",
-      "ctrl-\"": null, // reset ctrl+shift+2 binding
-    },
+      "ctrl-\"": null // reset ctrl+shift+2 binding
+    }
   },
   {
     "context": "Pane",
@@ -37,7 +37,7 @@
       "ctrl-!": ["workspace::MoveItemToPane", { "destination": 0 }],
       "ctrl-\"": ["workspace::MoveItemToPane", {"destination": 1 }],
       "ctrl-·": ["workspace::MoveItemToPane", { "destination": 2 }],
-      "ctrl-$": ["workspace::MoveItemToPane", { "destination": 3 }],
+      "ctrl-$": ["workspace::MoveItemToPane", { "destination": 3 }]
       // "ctrl-alt-1": ["workspace::MoveItemToPane", { "destination": 0 }],
       // "ctrl-alt-2": ["workspace::MoveItemToPane", { "destination": 1 }],
       // "ctrl-alt-3": ["workspace::MoveItemToPane", { "destination": 2 }],
@@ -50,7 +50,7 @@
       "ctrl-.": "editor::ToggleCodeActions",
       "ctrl-shift-i": "agent::ToggleFocus",
       "alt--":"pane::GoBack",
-      "alt-_":"pane::GoForward",
-    },
-  },
+      "alt-_":"pane::GoForward"
+    }
+  }
 ]
