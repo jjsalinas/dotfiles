@@ -9,7 +9,9 @@ DRY_RUN=false
 CHECK=false
 
 GHOSTTY_CONFIG_DIR="$HOME/.config/ghostty"
-GHOSTTY_CONFIG="$GHOSTTY_CONFIG_DIR/config.ghostty"
+GHOSTTY_CONFIG="$GHOSTTY_CONFIG_DIR/config"
+
+THEMES_URL="https://raw.githubusercontent.com/jjsalinas/dotfiles/main/ghostty/themes.zip"
 
 # ====================
 # Logging
@@ -47,6 +49,7 @@ Options:
 What this does:
   • Writes ghostty config directly to ~/.config/ghostty/config
   • Backs up any existing config before overwriting
+  • Downloads and installs themes from your dotfiles repo
   • Works on Ubuntu and Fedora
 
 Themes:
@@ -144,7 +147,7 @@ log_info "Writing ghostty config to $GHOSTTY_CONFIG"
 if ! $DRY_RUN; then
   cat << EOF > "$GHOSTTY_CONFIG"
 # ~/.config/ghostty/config
-# Managed by setup-ghostty.sh
+# Managed by config.sh
 
 ### Font ###
 font-family = Fira Mono
@@ -194,10 +197,32 @@ fi
 # ====================
 # Install themes
 # ====================
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+LOCAL_THEMES_ZIP="$SCRIPT_DIR/themes.zip"
+
 if ! $DRY_RUN; then
-  log_info "Installing ghostty themes to $GHOSTTY_CONFIG_DIR/themes"
-  SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-  run unzip -qo "$SCRIPT_DIR/themes.zip" -d "$GHOSTTY_CONFIG_DIR"
+  if [ -f "$LOCAL_THEMES_ZIP" ]; then
+    log_info "Found local themes.zip, installing from $LOCAL_THEMES_ZIP"
+    unzip -qo "$LOCAL_THEMES_ZIP" -d "$GHOSTTY_CONFIG_DIR"
+    log_ok "Themes installed"
+  else
+    log_info "No local themes.zip found, downloading from $THEMES_URL"
+    THEMES_TMP="$(mktemp /tmp/ghostty-themes-XXXXXX.zip)"
+    if curl -fsSL "$THEMES_URL" -o "$THEMES_TMP"; then
+      unzip -qo "$THEMES_TMP" -d "$GHOSTTY_CONFIG_DIR"
+      rm -f "$THEMES_TMP"
+      log_ok "Themes installed"
+    else
+      log_warn "Could not download themes — skipping (theme name must still be valid)"
+      rm -f "$THEMES_TMP"
+    fi
+  fi
+else
+  if [ -f "$LOCAL_THEMES_ZIP" ]; then
+    log_info "[dry-run] would install themes from local $LOCAL_THEMES_ZIP"
+  else
+    log_info "[dry-run] would download $THEMES_URL and extract to $GHOSTTY_CONFIG_DIR"
+  fi
 fi
 
 # ====================
