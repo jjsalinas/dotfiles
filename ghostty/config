@@ -1,4 +1,6 @@
 # ~/.config/ghostty/config.ghostty
+# OR
+# ~/.config/ghostty/config
 
 ### Font ###
 font-family = Fira Mono
