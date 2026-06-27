@@ -13,14 +13,20 @@ GHOSTTY_CONFIG="$GHOSTTY_CONFIG_DIR/config"
 
 THEMES_URL="https://raw.githubusercontent.com/jjsalinas/dotfiles/main/ghostty/themes.zip"
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+LOCAL_THEMES_ZIP="$SCRIPT_DIR/themes.zip"
+
+# Populated by backup_config() if a backup is made
+CONFIG_BACKUP=""
+
 # ====================
 # Logging
 # ====================
-log_info()  { echo "[INFO]  $*"; }
-log_warn()  { echo "[WARN]  $*"; }
-log_ok()    { echo "[OK]    $*"; }
-log_fail()  { echo "[FAIL]  $*"; }
-log_error() { echo "[ERROR] $*" >&2; }
+log_info()  { echo -e "\n[\033[34mINFO\033[0m] $* "; }
+log_warn()  { echo -e "[\033[33mWARN\033[0m] $*"; }
+log_ok()    { echo -e "[\033[32m OK \033[0m] $*"; }
+log_fail()  { echo -e "[\033[31mFAIL\033[0m] $*"; }
+log_error() { echo -e "\n[ERROR] $*" >&2; }
 
 run() {
   if $DRY_RUN; then
@@ -67,39 +73,41 @@ EOF
 # ====================
 # Argument parsing
 # ====================
-while [[ $# -gt 0 ]]; do
-  case "$1" in
-    --theme)
-      THEME="$2"
-      shift
-      ;;
-    --check)
-      CHECK=true
-      ;;
-    --dry-run)
-      DRY_RUN=true
-      ;;
-    --help)
-      print_help
-      exit 0
-      ;;
-    *)
-      log_error "Unknown option: $1"
-      exit 1
-      ;;
-  esac
-  shift
-done
+parse_args() {
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --theme)
+        THEME="$2"
+        shift
+        ;;
+      --check)
+        CHECK=true
+        ;;
+      --dry-run)
+        DRY_RUN=true
+        ;;
+      --help)
+        print_help
+        exit 0
+        ;;
+      *)
+        log_error "Unknown option: $1"
+        exit 1
+        ;;
+    esac
+    shift
+  done
+}
 
 # ====================
 # --check mode
 # ====================
-if $CHECK; then
+run_checks() {
   log_info "Running ghostty installation check..."
-  FAILURES=0
+  local failures=0
 
   check_ok()   { log_ok "$1"; }
-  check_fail() { log_fail "$1"; FAILURES=$((FAILURES + 1)); }
+  check_fail() { log_fail "$1"; failures=$((failures + 1)); }
 
   # Config dir
   [ -d "$GHOSTTY_CONFIG_DIR" ] \
@@ -113,6 +121,7 @@ if $CHECK; then
 
   # Theme
   if [ -f "$GHOSTTY_CONFIG" ]; then
+    local current_theme
     current_theme=$(grep -oP '(?<=^theme = )\S+' "$GHOSTTY_CONFIG" 2>/dev/null || true)
     [ -n "$current_theme" ] \
       && check_ok  "theme is set: $current_theme" \
@@ -120,31 +129,39 @@ if $CHECK; then
   fi
 
   echo ""
-  if [ "$FAILURES" -eq 0 ]; then
+  if [ "$failures" -eq 0 ]; then
     log_info "All checks passed."
     exit 0
   else
-    log_error "$FAILURES check(s) failed."
+    log_error "$failures check(s) failed."
     exit 1
   fi
-fi
+}
 
 # ====================
 # Backup existing config
 # ====================
-if [ -f "$GHOSTTY_CONFIG" ]; then
-  log_info "Backing up existing ghostty config"
-  run cp "$GHOSTTY_CONFIG" "$GHOSTTY_CONFIG.backup.$(date +%s)"
-fi
+backup_config() {
+  if [ -f "$GHOSTTY_CONFIG" ]; then
+    log_info "Backing up existing ghostty config"
+    CONFIG_BACKUP="$GHOSTTY_CONFIG.backup.$(date +%s)"
+    run cp "$GHOSTTY_CONFIG" "$CONFIG_BACKUP"
+  fi
+}
 
 # ====================
 # Write config
 # ====================
-log_info "Creating ghostty config directory"
-run mkdir -p "$GHOSTTY_CONFIG_DIR"
+write_config() {
+  log_info "Creating ghostty config directory"
+  run mkdir -p "$GHOSTTY_CONFIG_DIR"
 
-log_info "Writing ghostty config to $GHOSTTY_CONFIG"
-if ! $DRY_RUN; then
+  log_info "Writing ghostty config to $GHOSTTY_CONFIG"
+  if $DRY_RUN; then
+    log_info "[dry-run] would write $GHOSTTY_CONFIG with theme $THEME"
+    return
+  fi
+
   cat << EOF > "$GHOSTTY_CONFIG"
 # ~/.config/ghostty/config
 # Managed by config.sh
@@ -189,47 +206,86 @@ keybind = ctrl+shift+w=close_surface
 # keybind = ctrl+shift+d=new_split:right
 # keybind = ctrl+shift+shift+d=new_split:down
 EOF
+
   log_info "Config written with theme: $THEME"
-else
-  log_info "[dry-run] would write $GHOSTTY_CONFIG with theme $THEME"
-fi
+}
 
 # ====================
 # Install themes
 # ====================
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-LOCAL_THEMES_ZIP="$SCRIPT_DIR/themes.zip"
+install_themes() {
+  if $DRY_RUN; then
+    if [ -f "$LOCAL_THEMES_ZIP" ]; then
+      log_info "[dry-run] would install themes from local $LOCAL_THEMES_ZIP"
+    else
+      log_info "[dry-run] would download $THEMES_URL and extract to $GHOSTTY_CONFIG_DIR"
+    fi
+    return
+  fi
 
-if ! $DRY_RUN; then
   if [ -f "$LOCAL_THEMES_ZIP" ]; then
     log_info "Found local themes.zip, installing from $LOCAL_THEMES_ZIP"
-    unzip -qo "$LOCAL_THEMES_ZIP" -d "$GHOSTTY_CONFIG_DIR"
+    run unzip -qo "$LOCAL_THEMES_ZIP" -d "$GHOSTTY_CONFIG_DIR"
+    log_ok "Themes installed"
+    return
+  fi
+
+  log_info "No local themes.zip found, downloading from $THEMES_URL"
+  local themes_tmp
+  themes_tmp="$(mktemp /tmp/ghostty-themes-XXXXXX.zip)"
+
+  if curl -fsSL "$THEMES_URL" -o "$themes_tmp"; then
+    run unzip -qo "$themes_tmp" -d "$GHOSTTY_CONFIG_DIR"
+    rm -f "$themes_tmp"
     log_ok "Themes installed"
   else
-    log_info "No local themes.zip found, downloading from $THEMES_URL"
-    THEMES_TMP="$(mktemp /tmp/ghostty-themes-XXXXXX.zip)"
-    if curl -fsSL "$THEMES_URL" -o "$THEMES_TMP"; then
-      unzip -qo "$THEMES_TMP" -d "$GHOSTTY_CONFIG_DIR"
-      rm -f "$THEMES_TMP"
-      log_ok "Themes installed"
-    else
-      log_warn "Could not download themes — skipping (theme name must still be valid)"
-      rm -f "$THEMES_TMP"
-    fi
+    log_warn "Could not download themes — skipping (theme name must still be valid)"
+    rm -f "$themes_tmp"
   fi
-else
-  if [ -f "$LOCAL_THEMES_ZIP" ]; then
-    log_info "[dry-run] would install themes from local $LOCAL_THEMES_ZIP"
-  else
-    log_info "[dry-run] would download $THEMES_URL and extract to $GHOSTTY_CONFIG_DIR"
-  fi
-fi
+}
 
 # ====================
-# Done
+# Final message
 # ====================
-log_info "Ghostty setup complete"
-log_info "Restart Ghostty to apply changes, or reload config with: ctrl+shift+,"
-if $DRY_RUN; then
-  log_warn "Dry-run mode enabled — no changes were made"
-fi
+print_completion_message() {
+  echo ""
+  log_info "Ghostty setup complete"
+
+  if $DRY_RUN; then
+    log_warn "Dry-run mode enabled — no changes were made"
+    return
+  fi
+
+  echo ""
+  echo "To apply the changes, do ONE of the following:"
+  echo "  1) Restart Ghostty"
+  echo "  2) Or reload the config with:  ctrl+shift+,"
+  echo ""
+  echo "Useful follow-ups:"
+  echo "  • Verify everything is set up correctly:  ./config.sh --check"
+  echo "  • Switch themes any time:                 ./config.sh --theme <name>"
+
+  if [ -n "$CONFIG_BACKUP" ]; then
+    echo ""
+    log_info "Your previous config was backed up to: $CONFIG_BACKUP"
+  fi
+}
+
+# ====================
+# Main
+# ====================
+main() {
+  parse_args "$@"
+
+  if $CHECK; then
+    run_checks
+    exit $?
+  fi
+
+  backup_config
+  write_config
+  install_themes
+  print_completion_message
+}
+
+main "$@"
