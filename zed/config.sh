@@ -13,14 +13,20 @@ ZED_CONFIG_DIR="$HOME/.config/zed"
 ZED_KEYMAP="$ZED_CONFIG_DIR/keymap.json"
 ZED_SETTINGS="$ZED_CONFIG_DIR/settings.json"
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Populated by backup_configs() if backups are made
+KEYMAP_BACKUP=""
+SETTINGS_BACKUP=""
+
 # ====================
 # Logging
 # ====================
-log_info()  { echo "[INFO]  $*"; }
-log_warn()  { echo "[WARN]  $*"; }
-log_ok()    { echo "[OK]    $*"; }
-log_fail()  { echo "[FAIL]  $*"; }
-log_error() { echo "[ERROR] $*" >&2; }
+log_info()  { echo -e "\n[\033[34mINFO\033[0m] $* "; }
+log_warn()  { echo -e "[\033[33mWARN\033[0m] $*"; }
+log_ok()    { echo -e "[\033[32m OK \033[0m] $*"; }
+log_fail()  { echo -e "[\033[31mFAIL\033[0m] $*"; }
+log_error() { echo -e "\n[ERROR] $*" >&2; }
 
 run() {
   if $DRY_RUN; then
@@ -65,50 +71,53 @@ EOF
 # ====================
 # Argument parsing
 # ====================
-while [[ $# -gt 0 ]]; do
-  case "$1" in
-    --keymap)
-      KEYMAP_SRC="$2"
-      shift
-      ;;
-    --settings)
-      SETTINGS_SRC="$2"
-      shift
-      ;;
-    --check)
-      CHECK=true
-      ;;
-    --dry-run)
-      DRY_RUN=true
-      ;;
-    --help)
-      print_help
-      exit 0
-      ;;
-    *)
-      log_error "Unknown option: $1"
-      exit 1
-      ;;
-  esac
-  shift
-done
+parse_args() {
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --keymap)
+        KEYMAP_SRC="$2"
+        shift
+        ;;
+      --settings)
+        SETTINGS_SRC="$2"
+        shift
+        ;;
+      --check)
+        CHECK=true
+        ;;
+      --dry-run)
+        DRY_RUN=true
+        ;;
+      --help)
+        print_help
+        exit 0
+        ;;
+      *)
+        log_error "Unknown option: $1"
+        exit 1
+        ;;
+    esac
+    shift
+  done
+}
 
 # ====================
 # Resolve source files
 # ====================
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-KEYMAP_SRC="${KEYMAP_SRC:-$SCRIPT_DIR/keymap.json}"
-SETTINGS_SRC="${SETTINGS_SRC:-$SCRIPT_DIR/settings.json}"
+resolve_sources() {
+  KEYMAP_SRC="${KEYMAP_SRC:-$SCRIPT_DIR/keymap.json}"
+  SETTINGS_SRC="${SETTINGS_SRC:-$SCRIPT_DIR/settings.json}"
+}
 
 # ====================
 # --check mode
 # ====================
-if $CHECK; then
+run_checks() {
   log_info "Running Zed installation check..."
-  FAILURES=0
+  local failures=0
 
   check_ok()   { log_ok "$1"; }
-  check_fail() { log_fail "$1"; FAILURES=$((FAILURES + 1)); }
+  check_fail() { log_fail "$1"; failures=$((failures + 1)); }
 
   # Zed binary
   if command -v zed &>/dev/null; then
@@ -149,101 +158,154 @@ if $CHECK; then
   fi
 
   echo ""
-  if [ "$FAILURES" -eq 0 ]; then
+  if [ "$failures" -eq 0 ]; then
     log_info "All checks passed."
     exit 0
   else
-    log_error "$FAILURES check(s) failed."
+    log_error "$failures check(s) failed."
     exit 1
   fi
-fi
+}
 
 # ====================
 # Pre-flight checks
 # ====================
-log_info "Checking prerequisites..."
+check_prerequisites() {
+  log_info "Checking prerequisites..."
 
-# Zed must be installed
-if ! command -v zed &>/dev/null; then
-  log_error "Zed is not installed or not in PATH."
-  log_error "Install it from https://zed.dev and re-run this script."
-  exit 1
-fi
-log_ok "Zed found: $(command -v zed)"
+  # Zed must be installed
+  if ! command -v zed &>/dev/null; then
+    log_error "Zed is not installed or not in PATH."
+    log_error "Install it from https://zed.dev and re-run this script."
+    exit 1
+  fi
+  log_ok "Zed found: $(command -v zed)"
 
-# Source files must exist
-if [ ! -f "$KEYMAP_SRC" ]; then
-  log_error "keymap.json source not found: $KEYMAP_SRC"
-  log_error "Pass a path with --keymap or place keymap.json next to this script."
-  exit 1
-fi
-log_ok "keymap source found: $KEYMAP_SRC"
+  # Source files must exist
+  if [ ! -f "$KEYMAP_SRC" ]; then
+    log_error "keymap.json source not found: $KEYMAP_SRC"
+    log_error "Pass a path with --keymap or place keymap.json next to this script."
+    exit 1
+  fi
+  log_ok "keymap source found: $KEYMAP_SRC"
 
-if [ ! -f "$SETTINGS_SRC" ]; then
-  log_error "settings.json source not found: $SETTINGS_SRC"
-  log_error "Pass a path with --settings or place settings.json next to this script."
-  exit 1
-fi
-log_ok "settings source found: $SETTINGS_SRC"
+  if [ ! -f "$SETTINGS_SRC" ]; then
+    log_error "settings.json source not found: $SETTINGS_SRC"
+    log_error "Pass a path with --settings or place settings.json next to this script."
+    exit 1
+  fi
+  log_ok "settings source found: $SETTINGS_SRC"
 
-# Warn if jq is missing (optional but useful)
-# SKIPPED: There are comments to in keymap.json to make it more useful
-# if ! command -v jq &>/dev/null; then
-#   log_warn "jq not found — skipping JSON validation of source files"
-# else
-#   log_info "Validating source files with jq..."
-#   if ! jq empty "$KEYMAP_SRC" 2>/dev/null; then
-#     log_error "keymap.json is not valid JSON: $KEYMAP_SRC"
-#     exit 1
-#   fi
-#   log_ok "keymap.json is valid JSON"
+  # Warn if jq is missing (optional but useful)
+  # SKIPPED: There are comments to in keymap.json to make it more useful
+  # if ! command -v jq &>/dev/null; then
+  #   log_warn "jq not found — skipping JSON validation of source files"
+  # else
+  #   log_info "Validating source files with jq..."
+  #   if ! jq empty "$KEYMAP_SRC" 2>/dev/null; then
+  #     log_error "keymap.json is not valid JSON: $KEYMAP_SRC"
+  #     exit 1
+  #   fi
+  #   log_ok "keymap.json is valid JSON"
 
-#   if ! jq empty "$SETTINGS_SRC" 2>/dev/null; then
-#     log_error "settings.json is not valid JSON: $SETTINGS_SRC"
-#     exit 1
-#   fi
-#   log_ok "settings.json is valid JSON"
-# fi
+  #   if ! jq empty "$SETTINGS_SRC" 2>/dev/null; then
+  #     log_error "settings.json is not valid JSON: $SETTINGS_SRC"
+  #     exit 1
+  #   fi
+  #   log_ok "settings.json is valid JSON"
+  # fi
+}
 
 # ====================
 # Ensure config dir exists
 # ====================
-if [ ! -d "$ZED_CONFIG_DIR" ]; then
-  log_info "Creating Zed config directory: $ZED_CONFIG_DIR"
-  run mkdir -p "$ZED_CONFIG_DIR"
-else
-  log_info "Zed config directory already exists: $ZED_CONFIG_DIR"
-fi
+ensure_config_dir() {
+  if [ ! -d "$ZED_CONFIG_DIR" ]; then
+    log_info "Creating Zed config directory: $ZED_CONFIG_DIR"
+    run mkdir -p "$ZED_CONFIG_DIR"
+  else
+    log_info "Zed config directory already exists: $ZED_CONFIG_DIR"
+  fi
+}
 
 # ====================
 # Backup existing configs
 # ====================
-TIMESTAMP=$(date +%s)
+backup_configs() {
+  local timestamp
+  timestamp=$(date +%s)
 
-if [ -f "$ZED_KEYMAP" ]; then
-  log_info "Backing up existing keymap.json"
-  run cp "$ZED_KEYMAP" "$ZED_KEYMAP.backup.$TIMESTAMP"
-fi
+  if [ -f "$ZED_KEYMAP" ]; then
+    log_info "Backing up existing keymap.json"
+    KEYMAP_BACKUP="$ZED_KEYMAP.backup.$timestamp"
+    run cp "$ZED_KEYMAP" "$KEYMAP_BACKUP"
+  fi
 
-if [ -f "$ZED_SETTINGS" ]; then
-  log_info "Backing up existing settings.json"
-  run cp "$ZED_SETTINGS" "$ZED_SETTINGS.backup.$TIMESTAMP"
-fi
+  if [ -f "$ZED_SETTINGS" ]; then
+    log_info "Backing up existing settings.json"
+    SETTINGS_BACKUP="$ZED_SETTINGS.backup.$timestamp"
+    run cp "$ZED_SETTINGS" "$SETTINGS_BACKUP"
+  fi
+}
 
 # ====================
 # Copy configs
 # ====================
-log_info "Copying keymap.json to $ZED_KEYMAP"
-run cp "$KEYMAP_SRC" "$ZED_KEYMAP"
+copy_configs() {
+  log_info "Copying keymap.json to $ZED_KEYMAP"
+  run cp "$KEYMAP_SRC" "$ZED_KEYMAP"
 
-log_info "Copying settings.json to $ZED_SETTINGS"
-run cp "$SETTINGS_SRC" "$ZED_SETTINGS"
+  log_info "Copying settings.json to $ZED_SETTINGS"
+  run cp "$SETTINGS_SRC" "$ZED_SETTINGS"
+}
 
 # ====================
-# Done
+# Final message
 # ====================
-log_info "Zed config setup complete"
-log_info "Restart Zed to apply changes, or reload config with: cmd+shift+p → reload config"
-if $DRY_RUN; then
-  log_warn "Dry-run mode enabled — no changes were made"
-fi
+print_completion_message() {
+  echo ""
+  log_info "Zed config setup complete"
+
+  if $DRY_RUN; then
+    log_warn "Dry-run mode enabled — no changes were made"
+    return
+  fi
+
+  echo ""
+  echo "To apply the changes, do ONE of the following:"
+  echo "  1) Restart Zed"
+  echo "  2) Or run:  cmd+shift+p → reload config"
+  echo ""
+  echo "Useful follow-ups:"
+  echo "  • Verify everything is set up correctly:  ./config.sh --check"
+  echo "  • Use a different keymap/settings file:   ./config.sh --keymap <file> --settings <file>"
+
+  if [ -n "$KEYMAP_BACKUP" ]; then
+    echo ""
+    log_info "Your previous keymap.json was backed up to: $KEYMAP_BACKUP"
+  fi
+  if [ -n "$SETTINGS_BACKUP" ]; then
+    log_info "Your previous settings.json was backed up to: $SETTINGS_BACKUP"
+  fi
+}
+
+# ====================
+# Main
+# ====================
+main() {
+  parse_args "$@"
+  resolve_sources
+
+  if $CHECK; then
+    run_checks
+    exit $?
+  fi
+
+  check_prerequisites
+  ensure_config_dir
+  backup_configs
+  copy_configs
+  print_completion_message
+}
+
+main "$@"
