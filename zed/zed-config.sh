@@ -44,7 +44,7 @@ print_help() {
 Zed editor config setup
 
 Usage:
-  ./config.sh [options]
+  ./zed-config.sh [options]
 
 Options:
   --keymap   <file>   Path to keymap.json to install   (default: ./keymap.json)
@@ -61,10 +61,10 @@ What this does:
   • Works on Ubuntu, Fedora, and macOS
 
 Examples:
-  ./config.sh
-  ./config.sh --keymap ./my-keymap.json --settings ./my-settings.json
-  ./config.sh --dry-run
-  ./config.sh --check
+  ./zed-config.sh
+  ./zed-config.sh --keymap ./my-keymap.json --settings ./my-settings.json
+  ./zed-config.sh --dry-run
+  ./zed-config.sh --check
 EOF
 }
 
