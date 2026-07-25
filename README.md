@@ -44,39 +44,33 @@ Run `./install.sh --help` to see all available options and details.
 > The one-line install will clone the repo to `~/.dotfiles` automatically.
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/jjsalinas/dotfiles/main/install.sh | bash
-```
-
-With options
-```bash
 curl -fsSL https://raw.githubusercontent.com/jjsalinas/dotfiles/main/install.sh | bash -s -- --theme clean --add-nvm
 ```
 
 ### Forgejo version
-```bash
-curl -fsSL https://git.puxorjensap.com/jjsalinas/dotfiles/raw/branch/main/install.sh | bash
-```
+
 ```bash
 curl -fsSL https://git.puxorjensap.com/jjsalinas/dotfiles/raw/branch/main/install.sh | bash -s -- --theme clean --add-nvm
 ```
 
 ----
+## Other configs
+Scripts to setup the config for: **Doom emacs**, **Zed** editor and **Ghostty** terminal are present.
 
-## Ghostty terminal
-Custom ghostty configuration setup can be quickly run:
+### Example: Ghostty terminal
+Custom ghostty configuration setup can be quickly run 
+  (`--help` for complete info and params):
 ```bash
-./ghostty/config.sh
-```
-
-All info of this script can be check via:
-```bash
-./ghostty/config.sh --help
+./ghostty/ghostty-config.sh
 ```
 
 Can also be run with a curl single liner:
 ```bash
-curl -fsSL https://raw.githubusercontent.com/jjsalinas/dotfiles/main/ghostty/config.sh | bash -s -- --theme Subliminal
+curl -fsSL https://raw.githubusercontent.com/jjsalinas/dotfiles/main/ghostty/ghostty-config.sh | bash -s -- --theme Subliminal
 ```
 ```bash
-curl -fsSL https://git.puxorjensap.com/jjsalinas/dotfiles/raw/branch/main/ghostty/config.sh | bash -s -- --theme Subliminal
+curl -fsSL https://git.puxorjensap.com/jjsalinas/dotfiles/raw/branch/main/ghostty/ghostty-config.sh | bash -s -- --theme Subliminal
 ```
+
+Same for Zed and Doom emacs, just run the config script under the same name folder of each.
+
