@@ -60,3 +60,6 @@
 
 (when (fboundp 'pixel-scroll-precision-mode)
   (pixel-scroll-precision-mode 1))
+
+;; Treemacs on the right side
+(setq treemacs-position 'right)
