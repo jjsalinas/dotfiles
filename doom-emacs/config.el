@@ -63,3 +63,12 @@
 
 ;; Treemacs on the right side
 (setq treemacs-position 'right)
+
+;; JS eglot LSP conf
+(after! eglot
+  (add-to-list 'eglot-server-programs
+               '((js-mode js-ts-mode typescript-mode typescript-ts-mode)
+                 . ("typescript-language-server" "--stdio"))))
+
+;; F12 → Go to definition
+(global-set-key (kbd "<f12>") #'xref-find-definitions)
