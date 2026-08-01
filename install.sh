@@ -186,6 +186,7 @@ run_checks() {
   check_symlink "$ZSH_DIR/history.zsh"      "$DOTFILES_DIR/zsh/history.zsh"
   check_symlink "$ZSH_DIR/fzf.zsh"          "$DOTFILES_DIR/zsh/fzf.zsh"
   check_symlink "$ZSH_DIR/plugins.zsh"      "$DOTFILES_DIR/zsh/plugins.zsh"
+  check_symlink "$ZSH_DIR/aliases.zsh"      "$DOTFILES_DIR/zsh/aliases.zsh"
 
   # .zshrc.local
   [ -f "$ZSHRC_LOCAL" ] \
@@ -299,6 +300,7 @@ create_symlinks() {
   run ln -sf "$DOTFILES_DIR/zsh/history.zsh"     "$ZSH_DIR/history.zsh"
   run ln -sf "$DOTFILES_DIR/zsh/fzf.zsh"         "$ZSH_DIR/fzf.zsh"
   run ln -sf "$DOTFILES_DIR/zsh/plugins.zsh"     "$ZSH_DIR/plugins.zsh"
+  run ln -sf "$DOTFILES_DIR/zsh/aliases.zsh"     "$ZSH_DIR/aliases.zsh"
 }
 
 # ====================

@@ -116,7 +116,8 @@ remove_configs() {
       "$ZSH_DIR/history.zsh" \
       "$ZSH_DIR/fzf.zsh" \
       "$ZSH_DIR/plugins.zsh" \
-      "$ZSH_DIR/nvm.zsh"
+      "$ZSH_DIR/nvm.zsh" \
+      "$ZSH_DIR/aliases.zsh"
 
     # Remove directory if empty
     if $DRY_RUN; then
