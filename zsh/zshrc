@@ -14,6 +14,7 @@ source ~/.zsh/keybindings.zsh
 source ~/.zsh/history.zsh
 source ~/.zsh/fzf.zsh
 source ~/.zsh/plugins.zsh
+source ~/.zsh/aliases.zsh
 
 # Optional NVM
 [ -f ~/.zsh/nvm.zsh ] && source ~/.zsh/nvm.zsh
