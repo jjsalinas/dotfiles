@@ -72,3 +72,9 @@
 
 ;; F12 → Go to definition
 (global-set-key (kbd "<f12>") #'xref-find-definitions)
+
+;; C-c d -> duplicate selection
+;; (global-set-key (kbd "C-c d") #'duplicate-dwim)
+
+;; C-c d -> duplicate line
+(global-set-key (kbd "C-c d") #'duplicate-line)
