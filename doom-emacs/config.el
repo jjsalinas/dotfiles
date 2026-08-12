@@ -13,6 +13,7 @@
 ;; Relative line numbers
 ;; (setq display-line-numbers-type 'relative)
 
+
 ;; ---------------------------------------------------------------------------
 ;; Cursor
 ;; ---------------------------------------------------------------------------
@@ -26,6 +27,7 @@
 (setq blink-cursor-interval 0.6
       blink-cursor-delay 0.2
       blink-cursor-blinks 0)
+
 
 ;; ---------------------------------------------------------------------------
 ;; Ultra-scroll / smooth scrolling
@@ -46,6 +48,7 @@
       mouse-wheel-progressive-speed nil
       mouse-wheel-follow-mouse t)
 
+
 ;; ---------------------------------------------------------------------------
 ;; Helpful visual feedback
 ;; ---------------------------------------------------------------------------
@@ -54,6 +57,7 @@
 (column-number-mode 1)
 (global-hl-line-mode 1)
 
+
 ;; ---------------------------------------------------------------------------
 ;; Extra smooth pixel scrolling
 ;; ---------------------------------------------------------------------------
@@ -61,20 +65,68 @@
 (when (fboundp 'pixel-scroll-precision-mode)
   (pixel-scroll-precision-mode 1))
 
-;; Treemacs on the right side
+
+;; ---------------------------------------------------------------------------
+;; Treemacs
+;; ---------------------------------------------------------------------------
+
+;; Put Treemacs on the right side.
 (setq treemacs-position 'right)
 
-;; JS eglot LSP conf
-(after! eglot
-  (add-to-list 'eglot-server-programs
-               '((js-mode js-ts-mode typescript-mode typescript-ts-mode)
-                 . ("typescript-language-server" "--stdio"))))
 
-;; F12 → Go to definition
+;; ---------------------------------------------------------------------------
+;; Keyboard
+;; ---------------------------------------------------------------------------
+
+;; On macOS, make Command act as Ctrl.
+;; (when (eq system-type 'darwin)
+;;   (setq mac-command-modifier 'control))
+
+;; F12 → Go to definition.
 (global-set-key (kbd "<f12>") #'xref-find-definitions)
 
-;; C-c d -> duplicate selection
-;; (global-set-key (kbd "C-c d") #'duplicate-dwim)
-
-;; C-c d -> duplicate line
+;; C-c d → duplicate line.
 (global-set-key (kbd "C-c d") #'duplicate-line)
+
+
+;; ---------------------------------------------------------------------------
+;; LSP
+;; ---------------------------------------------------------------------------
+
+;; JavaScript / TypeScript Eglot configuration.
+(after! eglot
+  (add-to-list 'eglot-server-programs
+               '((js-mode
+                  js-ts-mode
+                  typescript-mode
+                  typescript-ts-mode)
+                 . ("typescript-language-server" "--stdio"))))
+
+
+;; ---------------------------------------------------------------------------
+;; Breadcrumbs
+;; ---------------------------------------------------------------------------
+
+;; Show breadcrumbs automatically after the major mode has initialized.
+(after! breadcrumb
+  (add-hook 'after-change-major-mode-hook #'breadcrumb-mode))
+
+
+;; ---------------------------------------------------------------------------
+;; Minimap
+;; ---------------------------------------------------------------------------
+
+(after! minimap
+
+  ;; Put the minimap on the right side.
+  (setq minimap-window-location 'right)
+
+  ;; Keep the minimap narrow.
+  (setq minimap-width-fraction 0.06)
+
+  ;; Automatically enable the minimap for large programming files.
+  (defun my/minimap-maybe-enable ()
+    (when (> (buffer-size) 50000)
+      (minimap-mode 1)))
+
+  (add-hook 'prog-mode-hook #'my/minimap-maybe-enable))
