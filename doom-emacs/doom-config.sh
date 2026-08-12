@@ -11,10 +11,12 @@ SKIP_SYNC=false
 DOOM_CONFIG_DIR="$HOME/.config/doom"
 DOOM_USER_CONFIG="$DOOM_CONFIG_DIR/config.el"
 DOOM_INIT="$DOOM_CONFIG_DIR/init.el"
+DOOM_PACKAGES="$DOOM_CONFIG_DIR/packages.el"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CONFIG_SRC="$SCRIPT_DIR/config.el"
 INIT_SRC="$SCRIPT_DIR/init.el"
+PACKAGES_SRC="$SCRIPT_DIR/packages.el"
 
 # Populated by backup_configs() if backups are made
 CONFIG_BACKUP=""
@@ -56,8 +58,8 @@ Options:
 What this does:
   • Checks that Doom Emacs is installed (doom binary in PATH)
   • Ensures ~/.config/doom/ exists
-  • Backs up any existing config.el / init.el before overwriting
-  • Copies config.el and init.el from this repo into ~/.config/doom/
+  • Backs up any existing config.el / init.el / packages.el before overwriting
+  • Copies config.el, init.el and packages.el from this repo into ~/.config/doom/
   • Runs `doom sync` to apply changes
 
 Examples:
@@ -135,6 +137,11 @@ run_checks() {
     && check_ok  "init.el exists: $DOOM_INIT" \
     || check_fail "init.el missing: $DOOM_INIT"
 
+  # packages.el
+  [ -f "$DOOM_PACKAGES" ] \
+    && check_ok  "init.el exists: $DOOM_PACKAGES" \
+    || check_fail "init.el missing: $DOOM_PACKAGES"
+
   echo ""
   if [ "$failures" -eq 0 ]; then
     log_info "All checks passed."
@@ -175,6 +182,11 @@ check_prerequisites() {
     exit 1
   fi
   log_ok "init.el source found: $INIT_SRC"
+  if [ ! -f "$PACKAGES_SRC" ]; then
+    log_error "packages.el source not found: $PACKAGES_SRC"
+    exit 1
+  fi
+  log_ok "packages.el source found: $PACKAGES_SRC"
 }
 
 # ====================
@@ -207,6 +219,12 @@ backup_configs() {
     INIT_BACKUP="$DOOM_INIT.backup.$timestamp"
     run cp "$DOOM_INIT" "$INIT_BACKUP"
   fi
+
+  if [ -f "$DOOM_PACKAGES" ]; then
+    log_info "Backing up existing packages.el"
+    PACKAGES_BACKUP="$DOOM_PACKAGES.backup.$timestamp"
+    run cp "$DOOM_PACKAGES" "$PACKAGES_BACKUP"
+  fi
 }
 
 # ====================
@@ -218,6 +236,9 @@ copy_configs() {
 
   log_info "Copying init.el to $DOOM_INIT"
   run cp "$INIT_SRC" "$DOOM_INIT"
+
+  log_info "Copying packages.el to $DOOM_PACKAGES"
+  run cp "$PACKAGES_SRC" "$DOOM_PACKAGES"
 }
 
 # ====================
@@ -260,6 +281,9 @@ print_completion_message() {
   fi
   if [ -n "$INIT_BACKUP" ]; then
     log_info "Your previous init.el was backed up to:   $INIT_BACKUP"
+  fi
+  if [ -n "$PACKAGES_BACKUP" ]; then
+    log_info "Your previous packages.el was backed up to:   $PACKAGES_BACKUP"
   fi
 }
 
