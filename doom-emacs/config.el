@@ -9,6 +9,8 @@
                  :size 16))
 
 (setq doom-theme 'doom-vibrant)
+;; (setq doom-theme 'doom-palenight)
+;; (setq doom-theme 'doom-monokai-pro)
 
 ;; Relative line numbers
 ;; (setq display-line-numbers-type 'relative)
