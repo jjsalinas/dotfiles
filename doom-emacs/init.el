@@ -146,7 +146,8 @@
    ;;plantuml            ; diagrams for confusing people more
    ;;graphviz            ; diagrams for confusing yourself even more
    ;;purescript          ; JavaScript, but functional
-   python               ; beautiful is better than ugly
+   ;;python              ; beautiful is better than ugly
+   (python +lsp)         ; python plus lint
    ;;qt                  ; the 'cutest' GUI framework ever
    ;;racket              ; a DSL for DSLs
    ;;raku                ; the artist formerly known as Perl 6

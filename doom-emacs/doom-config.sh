@@ -274,6 +274,8 @@ print_completion_message() {
   echo "Useful follow-ups:"
   echo "  • Verify everything is set up correctly:  ./doom-install.sh --check"
   echo "  • Re-run without syncing:                 ./doom-install.sh --skip-sync"
+  echo ""
+  echo " If icons are not shown correctly run inside emacs 'nerd-icons-install-fonts' (M-x can find it)"
 
   if [ -n "$CONFIG_BACKUP" ]; then
     echo ""

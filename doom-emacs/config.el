@@ -15,6 +15,11 @@
 ;; Relative line numbers
 ;; (setq display-line-numbers-type 'relative)
 
+;; Show a compact 24-hour clock in the modeline
+(setq display-time-24hr-format t
+      display-time-default-load-average nil
+      display-time-format "%H:%M")
+(display-time-mode 1)
 
 ;; ---------------------------------------------------------------------------
 ;; Cursor
